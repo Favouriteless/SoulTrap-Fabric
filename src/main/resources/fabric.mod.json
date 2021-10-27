@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "soultrap",
+  "version": "${version}",
+
+  "name": "Soul Trap",
+  "description": "A new way to create mob spawners",
+  "authors": [
+    "Favouriteless"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/soul-trap-fabric",
+    "sources": "https://www.curseforge.com/minecraft/mc-mods/soul-trap-fabric"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.fabricmc.example.ExampleMod"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
