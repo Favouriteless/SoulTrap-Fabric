@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "com.favouriteless.soultrap.SoulTrap"
+    ],
+    "client":[
+      "com.favouriteless.soultrap.SoulTrapClient"
     ]
   },
 

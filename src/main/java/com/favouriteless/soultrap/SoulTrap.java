@@ -22,6 +22,15 @@
 package com.favouriteless.soultrap;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,8 +38,12 @@ public class SoulTrap implements ModInitializer {
 
 	public static final Logger LOGGER = LogManager.getLogger("soultrap");
 
+	public static final Block SOUL_TRAP_BLOCK = new SoulTrapBlock(AbstractBlock.Settings.of(Material.STONE).requiresTool().strength(3.5F).luminance((state) -> 3).nonOpaque());
+	public static final Item SOUL_TRAP_ITEM = new BlockItem(SOUL_TRAP_BLOCK, new Item.Settings().maxCount(1).group(ItemGroup.REDSTONE));
+
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Hello Fabric world!");
+		Registry.register(Registry.BLOCK, new Identifier("soultrap", "soul_trap"), SOUL_TRAP_BLOCK);
+		Registry.register(Registry.ITEM, new Identifier("soultrap", "soul_trap"), SOUL_TRAP_ITEM);
 	}
 }
