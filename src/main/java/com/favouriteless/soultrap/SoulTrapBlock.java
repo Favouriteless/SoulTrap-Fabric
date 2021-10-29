@@ -21,27 +21,27 @@
 
 package com.favouriteless.soultrap;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.List;
 import java.util.Random;
@@ -60,13 +60,15 @@ public class SoulTrapBlock extends Block {
             EntityType.SILVERFISH
     };
 
-    public SoulTrapBlock(Settings settings) {
+    public SoulTrapBlock(Properties settings) {
         super(settings);
     }
 
+
+
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if(!world.isClient) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if(!world.isClientSide) {
             if(checkValidCage(world, pos)) {
                 List<Entity> entities = getTrapEntities(world, pos);
                 if(!entities.isEmpty()) {
@@ -77,44 +79,44 @@ public class SoulTrapBlock extends Block {
                             createSpawner(world, pos, (LivingEntity)entity);
                             entity.remove(Entity.RemovalReason.DISCARDED);
 
-                            world.playSound(null, pos, SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.MASTER, 1f, 0.3f);
+                            world.playSound(null, pos, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.MASTER, 1f, 0.3f);
                         } else {
-                            player.sendMessage(new LiteralText("Creature is not valid.").formatted(Formatting.RED), false);
-                            world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.BLOCKS, 1f, 0.5f);
+                            player.displayClientMessage(new TextComponent("Creature is not valid.").withStyle(ChatFormatting.RED), false);
+                            world.playSound(null, pos, SoundEvents.NOTE_BLOCK_SNARE, SoundSource.BLOCKS, 1f, 0.5f);
                         }
                     } else {
-                        player.sendMessage(new LiteralText("Too many creatures.").formatted(Formatting.RED), false);
-                        world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.BLOCKS, 1f, 0.5f);
+                        player.displayClientMessage(new TextComponent("Too many creatures.").withStyle(ChatFormatting.RED), false);
+                        world.playSound(null, pos, SoundEvents.NOTE_BLOCK_SNARE, SoundSource.BLOCKS, 1f, 0.5f);
                     }
                 } else {
-                    player.sendMessage(new LiteralText("Creature not found.").formatted(Formatting.RED), false);
-                    world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.BLOCKS, 1f, 0.5f);
+                    player.displayClientMessage(new TextComponent("Creature not found.").withStyle(ChatFormatting.RED), false);
+                    world.playSound(null, pos, SoundEvents.NOTE_BLOCK_SNARE, SoundSource.BLOCKS, 1f, 0.5f);
                 }
             } else {
-                player.sendMessage(new LiteralText("Cage is not valid").formatted(Formatting.RED), false);
-                world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.BLOCKS, 1f, 0.5f);
+                player.displayClientMessage(new TextComponent("Cage is not valid").withStyle(ChatFormatting.RED), false);
+                world.playSound(null, pos, SoundEvents.NOTE_BLOCK_SNARE, SoundSource.BLOCKS, 1f, 0.5f);
             }
-            return ActionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public static boolean checkValidCage(World world, BlockPos pos) {
+    public static boolean checkValidCage(Level world, BlockPos pos) {
         BlockPos[] ironBlocks = new BlockPos[] {
-                pos.offset(Direction.NORTH).offset(Direction.WEST), // NorthWest
-                pos.offset(Direction.NORTH).offset(Direction.EAST), // NorthEast
-                pos.offset(Direction.SOUTH).offset(Direction.WEST), // SouthWest
-                pos.offset(Direction.SOUTH).offset(Direction.EAST), // SouthEast
-                pos.offset(Direction.UP, 3) // Top
+                pos.relative(Direction.NORTH).relative(Direction.WEST), // NorthWest
+                pos.relative(Direction.NORTH).relative(Direction.EAST), // NorthEast
+                pos.relative(Direction.SOUTH).relative(Direction.WEST), // SouthWest
+                pos.relative(Direction.SOUTH).relative(Direction.EAST), // SouthEast
+                pos.relative(Direction.UP, 3) // Top
         };
 
         BlockPos[] airBlocks = new BlockPos[] {
-                pos.offset(Direction.NORTH),
-                pos.offset(Direction.EAST),
-                pos.offset(Direction.SOUTH),
-                pos.offset(Direction.WEST),
-                pos.offset(Direction.UP),
-                pos.offset(Direction.UP, 2)
+                pos.relative(Direction.NORTH),
+                pos.relative(Direction.EAST),
+                pos.relative(Direction.SOUTH),
+                pos.relative(Direction.WEST),
+                pos.relative(Direction.UP),
+                pos.relative(Direction.UP, 2)
         };
 
         for(BlockPos ironPos : ironBlocks) {
@@ -130,12 +132,12 @@ public class SoulTrapBlock extends Block {
         }
 
 
-        BlockPos startPos = pos.add(-1, 1, -1);
+        BlockPos startPos = pos.offset(-1, 1, -1);
 
         for(int x = 0; x < 3; x++) {
             for(int z = 0; z < 3; z++) {
                 for(int y = 0; y < 3; y++) {
-                    Block block = world.getBlockState(startPos.add(x, y, z)).getBlock();
+                    Block block = world.getBlockState(startPos.offset(x, y, z)).getBlock();
                     if (!(x == 1 && z == 1)) {
                         if(block != Blocks.IRON_BARS) {
                             return false;
@@ -157,8 +159,8 @@ public class SoulTrapBlock extends Block {
         return false;
     }
 
-    public static List<Entity> getTrapEntities(World world, BlockPos pos) {
-        List<Entity> entities =  world.getOtherEntities(null, new Box(pos.add(new BlockPos(-1, 1, -1)), pos.add(new BlockPos(1, 3, 1))));
+    public static List<Entity> getTrapEntities(Level world, BlockPos pos) {
+        List<Entity> entities =  world.getEntities(null, new AABB(pos.offset(new BlockPos(-1, 1, -1)), pos.offset(new BlockPos(1, 3, 1))));
 
         for(int i = entities.size() - 1; i >= 0; i--) {
             if(!(entities.get(i) instanceof LivingEntity)) {
@@ -168,29 +170,29 @@ public class SoulTrapBlock extends Block {
         return entities;
     }
 
-    public static void destroyCage(World world, BlockPos pos) {
-        BlockPos startPos = pos.add(-1, 0, -1);
+    public static void destroyCage(Level world, BlockPos pos) {
+        BlockPos startPos = pos.offset(-1, 0, -1);
 
         for(int x = 0; x < 3; x++) {
             for(int y = 0; y < 4; y++) {
                 for(int z = 0; z < 3; z++) {
-                    world.breakBlock(startPos.add(x,y,z), false);
-                    spawnParticles(world, startPos.add(x,y,z));
+                    world.destroyBlock(startPos.offset(x,y,z), false);
+                    spawnParticles(world, startPos.offset(x,y,z));
                 }
             }
         }
     }
 
-    public static void createSpawner(World world, BlockPos pos, LivingEntity entity) {
-        world.setBlockState(pos, Blocks.SPAWNER.getDefaultState());
-        MobSpawnerBlockEntity blockEntity = (MobSpawnerBlockEntity)world.getBlockEntity(pos);
-        blockEntity.getLogic().setEntityId(entity.getType());
+    public static void createSpawner(Level world, BlockPos pos, LivingEntity entity) {
+        world.setBlockAndUpdate(pos, Blocks.SPAWNER.defaultBlockState());
+        SpawnerBlockEntity blockEntity = (SpawnerBlockEntity)world.getBlockEntity(pos);
+        blockEntity.getSpawner().setEntityId(entity.getType());
     }
 
-    public static void spawnParticles(World world, BlockPos pos) {
-        if(!world.isClient) {
+    public static void spawnParticles(Level world, BlockPos pos) {
+        if(!world.isClientSide) {
             for (int i = 0; i < 3; i++) {
-                ((ServerWorld)world).spawnParticles(ParticleTypes.LARGE_SMOKE,
+                ((ServerLevel)world).sendParticles(ParticleTypes.LARGE_SMOKE,
                         pos.getX() + RANDOM.nextDouble(),
                         pos.getY() + RANDOM.nextDouble(),
                         pos.getZ() + RANDOM.nextDouble(),

@@ -22,13 +22,13 @@
 package com.favouriteless.soultrap;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.minecraft.client.render.RenderLayer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;;
+import net.minecraft.client.renderer.RenderType;
 
 public class SoulTrapClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        BlockRenderLayerMap.INSTANCE.putBlock(SoulTrap.SOUL_TRAP_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(SoulTrap.SOUL_TRAP_BLOCK, RenderType.cutout());
     }
 }
