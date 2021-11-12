@@ -21,11 +21,14 @@
 
 package com.favouriteless.soultrap;
 
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -49,16 +52,6 @@ import java.util.Random;
 public class SoulTrapBlock extends Block {
 
     public static final Random RANDOM = new Random();
-
-    public static final EntityType<?>[] VALID_ENTITIES = new EntityType[] {
-            EntityType.ZOMBIE,
-            EntityType.SKELETON,
-            EntityType.SPIDER,
-            EntityType.CAVE_SPIDER,
-            EntityType.BLAZE,
-            EntityType.MAGMA_CUBE,
-            EntityType.SILVERFISH
-    };
 
     public SoulTrapBlock(Properties settings) {
         super(settings);
@@ -151,10 +144,13 @@ public class SoulTrapBlock extends Block {
     }
 
     public static boolean checkValidEntity(Entity entity) {
-        for(EntityType<?> entityType : VALID_ENTITIES) {
-            if(entity.getType() == entityType) {
-                return true;
-            }
+        SoulTrapConfig config = AutoConfig.getConfigHolder(SoulTrapConfig.class).getConfig();
+
+        for (String entityString : config.mobList) {
+            EntityType<?> entityType = Registry.ENTITY_TYPE.get(new ResourceLocation(entityString));
+            boolean matches = entity.getType() == entityType;
+
+            return config.isBlacklist != matches;
         }
         return false;
     }

@@ -21,6 +21,8 @@
 
 package com.favouriteless.soultrap;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -44,5 +46,7 @@ public class SoulTrap implements ModInitializer {
 	public void onInitialize() {
 		Registry.register(Registry.BLOCK, new ResourceLocation("soultrap", "soul_trap"), SOUL_TRAP_BLOCK);
 		Registry.register(Registry.ITEM, new ResourceLocation("soultrap", "soul_trap"), SOUL_TRAP_ITEM);
+
+		AutoConfig.register(SoulTrapConfig.class, Toml4jConfigSerializer::new);
 	}
 }
