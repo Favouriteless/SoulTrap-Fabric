@@ -30,6 +30,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +40,7 @@ public class SoulTrap implements ModInitializer {
 
 	public static final Logger LOGGER = LogManager.getLogger("soultrap");
 
-	public static final Block SOUL_TRAP_BLOCK = new SoulTrapBlock(BlockBehaviour.Properties.of(Material.STONE).requiresCorrectToolForDrops().strength(3.5F).lightLevel((state) -> 3).noOcclusion());
+	public static final Block SOUL_TRAP_BLOCK = new SoulTrapBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).lightLevel((state) -> 3).noOcclusion().requiresCorrectToolForDrops());
 	public static final Item SOUL_TRAP_ITEM = new BlockItem(SOUL_TRAP_BLOCK, new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_REDSTONE));
 
 	@Override

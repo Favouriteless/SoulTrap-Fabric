@@ -57,10 +57,13 @@ public class SoulTrapBlock extends Block {
         super(settings);
     }
 
+    private static SoulTrapConfig config = null;
+
 
 
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        config = AutoConfig.getConfigHolder(SoulTrapConfig.class).getConfig();
         if(!world.isClientSide) {
             if(checkValidCage(world, pos)) {
                 List<Entity> entities = getTrapEntities(world, pos);
@@ -71,7 +74,7 @@ public class SoulTrapBlock extends Block {
                             destroyCage(world, pos);
                             createSpawner(world, pos, (LivingEntity)entity);
                             entity.remove(Entity.RemovalReason.DISCARDED);
-
+                            if(!player.isCreative() && player.experienceLevel >= config.xp_cost) player.giveExperienceLevels(-config.xp_cost);
                             world.playSound(null, pos, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.MASTER, 1f, 0.3f);
                         } else {
                             player.displayClientMessage(new TextComponent("Creature is not valid.").withStyle(ChatFormatting.RED), false);
@@ -89,8 +92,10 @@ public class SoulTrapBlock extends Block {
                 player.displayClientMessage(new TextComponent("Cage is not valid").withStyle(ChatFormatting.RED), false);
                 world.playSound(null, pos, SoundEvents.NOTE_BLOCK_SNARE, SoundSource.BLOCKS, 1f, 0.5f);
             }
+            config = null;
             return InteractionResult.CONSUME;
         }
+        config = null;
         return InteractionResult.SUCCESS;
     }
 
@@ -144,8 +149,6 @@ public class SoulTrapBlock extends Block {
     }
 
     public static boolean checkValidEntity(Entity entity) {
-        SoulTrapConfig config = AutoConfig.getConfigHolder(SoulTrapConfig.class).getConfig();
-
         for (String entityString : config.mobList) {
             EntityType<?> entityType = Registry.ENTITY_TYPE.get(new ResourceLocation(entityString));
             boolean matches = entity.getType() == entityType;

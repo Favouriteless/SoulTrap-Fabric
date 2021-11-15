@@ -11,5 +11,6 @@ public class SoulTrapConfig implements ConfigData {
 
     public boolean isBlacklist = false;
     public List<String> mobList = Arrays.asList("minecraft:zombie", "minecraft:skeleton", "minecraft:spider", "minecraft:cave_spider", "minecraft:blaze", "minecraft:magma_cube", "minecraft:silverfish");
+    public int xp_cost = 0;
 
 }
