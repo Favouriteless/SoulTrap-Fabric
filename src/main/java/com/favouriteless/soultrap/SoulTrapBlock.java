@@ -73,7 +73,7 @@ public class SoulTrapBlock extends Block {
                         if(checkValidEntity(entity)) {
                             destroyCage(world, pos);
                             createSpawner(world, pos, (LivingEntity)entity);
-                            entity.remove(Entity.RemovalReason.DISCARDED);
+                            entity.remove();
                             if(!player.isCreative() && player.experienceLevel >= config.xp_cost) player.giveExperienceLevels(-config.xp_cost);
                             world.playSound(null, pos, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.MASTER, 1f, 0.3f);
                         } else {
