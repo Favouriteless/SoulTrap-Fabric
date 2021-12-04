@@ -151,11 +151,14 @@ public class SoulTrapBlock extends Block {
     public static boolean checkValidEntity(Entity entity) {
         for (String entityString : config.mobList) {
             EntityType<?> entityType = Registry.ENTITY_TYPE.get(new ResourceLocation(entityString));
+
             boolean matches = entity.getType() == entityType;
 
-            return config.isBlacklist != matches;
+            if(matches) {
+                return !config.isBlacklist;
+            }
         }
-        return false;
+        return config.isBlacklist;
     }
 
     public static List<Entity> getTrapEntities(Level world, BlockPos pos) {
