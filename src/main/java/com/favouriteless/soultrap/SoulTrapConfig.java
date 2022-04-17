@@ -6,7 +6,7 @@ import me.shedaniel.autoconfig.annotation.Config;
 import java.util.Arrays;
 import java.util.List;
 
-@Config(name = "soultrap-common")
+@Config(name="soultrap-common")
 public class SoulTrapConfig implements ConfigData {
 
     public boolean isBlacklist = false;
